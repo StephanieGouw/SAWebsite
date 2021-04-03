@@ -15,11 +15,21 @@ def generate_image():
     # plt.plot(x, y)
 
     r = requests.get("https://picsum.photos/200/300?grayscale")
-    img = io.BytesIO(r.content)              # create file-like object in memory to save image without using disk
+    img_byte_array = io.BytesIO(r.content)              # create file-like object in memory to save image without using disk
     # plt.savefig(img, format='png')  # save image in file-like object
-    img.seek(0)
+    #convert from Byte array to Image file
+    im_Image = Image.open(img_byte_array)
+    im_Image = im_Image.convert('RGB') # ensure image has 3 channels
 
-    return img
+
+    #convert Image to Byte array
+    img_byte_array = io.BytesIO()
+    im_Image.save(img_byte_array, format='PNG')
+    # img_byte_array = img_byte_array.getvalue()
+    
+    # img_byte_array.seek(0)
+
+    return img_byte_array
 
 @app.route('/')
 @app.route('/index')
