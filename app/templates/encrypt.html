@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Get Colour</h1>
+    <form action="" method="POST" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.colour.label }}<br>
+            {{ form.colour(size=32) }}
+        </p>
+        <p>{{ form.submit() }}</p>
+    </form>
+    <img src="data:image/png;base64,{{data}}">
+{% endblock %}

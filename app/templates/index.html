@@ -5,6 +5,5 @@
     {% for post in posts %}
     <div><p>{{ post.author.username }} says: <b>{{ post.body }}</b></p></div>
     {% endfor %}
-    <img src="data:image/png;base64,{{data}}">
-    <!-- <img src="{{ image }}" alt="User Image"> -->
+    <a href="/encrypt">Encrypt colour</a>
 {% endblock %}

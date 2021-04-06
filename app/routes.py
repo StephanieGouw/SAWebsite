@@ -1,6 +1,7 @@
 from app import app
+from app.forms import ColourForm
 import requests
-from flask import render_template
+from flask import render_template, flash, redirect, request
 from PIL import Image
 from PIL.ImageColor import getcolor, getrgb
 from PIL.ImageOps import grayscale
@@ -40,7 +41,7 @@ def image_tint(tint='#ffffff'):
 
     return Image.merge(*merge_args).point(luts)
 
-def generate_image():
+def generate_image(colour):
 
     # y = [random.randint(-10, 10) for _ in range(10)]
     # x = list(range(10))
@@ -58,7 +59,7 @@ def generate_image():
 
     # im2 = Image.fromarray(data)
 
-    result = image_tint('#030FFC')
+    result = image_tint(colour)
 
     #convert Image to Byte array
     img_byte_array = io.BytesIO()
@@ -69,36 +70,27 @@ def generate_image():
 
     return img_byte_array
 
-@app.route('/')
-@app.route('/index')
-def index():
-    user = {'username': 'Miguel'}
-    posts = [
-        {
-            'author': {'username': 'John'},
-            'body': 'Beautiful day in Portland!'
-        },
-        {
-            'author': {'username': 'Susan'},
-            'body': 'The Avengers movie was so cool!'
-        }
-    ]
-    #image = Image.open("https://picsum.photos/200/300?grayscale")
-    #image = image.convert("RGB")
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/encrypt', methods=['GET', 'POST'])
+def encrypt():
+    form = ColourForm()
+    if request.method == 'GET' or request.method == 'POST':
+        flash('Colour to encrypt {}'.format(
+            form.colour.data))
+        img = generate_image(form.colour.data)
 
+        data = img.getvalue()         # get data from file (BytesIO)
 
-    # in_memory_file = io.BytesIO(r.content)
-    # im = Image.open(in_memory_file)
-    # output = io.StringIO()
-    # im.save(output, "PNG")
-    # contents = output.getvalue().encode("base64")
-    # output.close()
-    # contents = contents.split('\n')[0]
-    #im = im.convert("RGB")
-    img = generate_image()
+        data = base64.b64encode(data) # convert to base64 as bytes
+        data = data.decode()  
+        return render_template('encrypt.html', title='Encrypt colour', data=data, form=form)
+    return render_template('encrypt.html', title='Encrypt colour', form=form)
 
-    data = img.getvalue()         # get data from file (BytesIO)
-
-    data = base64.b64encode(data) # convert to base64 as bytes
-    data = data.decode()  
-    return render_template('index.html', title='Home', user=user, posts=posts, data=data)
+# @app.route('/encrypt', methods=['GET', 'POST'])
+# def encrypt():
+#     form = LoginForm()
+#     if form.validate_on_submit():
+#         flash('Colour to encrypt {}'.format(
+#             form.colour.data))
+#         return redirect('/index')
+#     return redirect('encrypt.html', title='Sign In', data=data)
